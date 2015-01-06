@@ -1,6 +1,10 @@
 CODE2040Project
 ===============
 Java Program for CODE2040 API Challanges
+Notes: 
+This was a good review as well as a lesson in Date Formatting
+
+Not sure if intentional or not but a needle is sometimes not provided
 
 Stage I: Reverse a string
 ================================
