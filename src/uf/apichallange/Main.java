@@ -3,25 +3,25 @@ package uf.apichallange;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream.GetField;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.sound.sampled.ReverbType;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+/**
+ * 
+ * @author Ubaldo Franco
+ * API Challage was a good review 
+ *
+ */
 
 public class Main {
 
@@ -29,79 +29,70 @@ public class Main {
 		// Get Token
 		String email = "ubaldo.franco@yahoo.com";
 		String github= "https://github.com/uafranco2013/CODE2040Project";
-		JSONObject sendData = new JSONObject();
-		JSONObject tokenData = new JSONObject();
 		String data;
+		JSONObject sendData = new JSONObject(); //used when sending answers
+		JSONObject tokenData = new JSONObject(); //used only when token is required
+		JSONObject root = new JSONObject(); 
+		JSONObject result = new JSONObject();
 		sendData.put("email", email);
 		sendData.put("github", github);
 		data = getData("http://challenge.code2040.org/api/register",sendData.toString());
-		JSONObject root = new JSONObject(data);
+		root = new JSONObject(data);
 		String token = root.getString("result");
 		tokenData.put("token", token);
+		
 		//Reverse String
-		/**
 		data = getData("http://challenge.code2040.org/api/getstring", tokenData.toString());	
 		root = new JSONObject(data);
 		String reverse = reverseString(root.getString("result"));
 		sendData = new JSONObject();
 		sendData.put("token", token);
-		sendData.put("string", reverse);
-		System.out.println(root.get("result"));
-		System.out.println(reverse);	
+		sendData.put("string", reverse);	
 		data = getData("http://challenge.code2040.org/api/validatestring", sendData.toString());
-		System.out.println(data);
+		System.out.println(new JSONObject(data).get("result"));
+		
 		//Find needle in haystack
 		data = getData("http://challenge.code2040.org/api/haystack", tokenData.toString());
-		System.out.println(data);
 		root = new JSONObject(data);
-		JSONObject result = root.getJSONObject("result");
+		result = root.getJSONObject("result");
 		JSONArray haystack = result.getJSONArray("haystack");
 		String needle = result.getString("needle");
-		System.out.println(needle + haystack.toString());
 		int location = findWord(needle, haystack);
-		System.out.println(location);
 		sendData = new JSONObject();
 		sendData.put("token", token);
 		sendData.put("needle", location);
 		data = getData("http://challenge.code2040.org/api/validateneedle", sendData.toString());
-		System.out.println(data);
-		**/	
+		System.out.println(new JSONObject(data).get("result"));
+	
 		//Prefix
 		data = getData("http://challenge.code2040.org/api/prefix", tokenData.toString());
-		System.out.println(data);
 		root = new JSONObject(data);
-		JSONObject result = root.getJSONObject("result");
+		result = root.getJSONObject("result");
 		JSONArray list = result.getJSONArray("array");
 		String prefix = result.getString("prefix");
 		JSONArray dataArray = deletePrefix(prefix, list);
-		System.out.println(dataArray.toString());
 		sendData = new JSONObject();
 		sendData.put("token", token);
 		sendData.put("array", dataArray);
 		data = getData("http://challenge.code2040.org/api/validateprefix", sendData.toString());
-		System.out.println(data);
+		System.out.println(new JSONObject(data).get("result"));
 		
 		//Dating Game
 		data = getData("http://challenge.code2040.org/api/time", tokenData.toString());
-		System.out.println(data);
 		root =  new JSONObject(data);
 		result = root.getJSONObject("result");
 		int interval = result.getInt("interval");
 		String dateStamp = result.getString("datestamp");
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-		DateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		Date date = dateFormat.parse(dateStamp);
-		Calendar gc = new GregorianCalendar();
-		gc.setTime(date);
-		gc.add(Calendar.SECOND,interval);
-		date = gc.getTime();
-		String finalDate= dateFormat.format(date).toString();
-		System.out.println(finalDate);
+		String finalDate = updateDate(dateStamp, interval);		
 		sendData = new JSONObject();
 		sendData.put("token", token);
 		sendData.put("datestamp", finalDate);
 		data = getData("http://challenge.code2040.org/api/validatetime", sendData.toString());
-		System.out.println(data);
+		System.out.println(new JSONObject(data).get("result"));
+		
+		//Status Check
+		data = getData("http://challenge.code2040.org/api/status", tokenData.toString());
+		System.out.println(new JSONObject(data).get("result"));
 		
 	}
 	
@@ -167,10 +158,17 @@ public class Main {
 			if(!list.get(i).toString().contains(prefix))
 				newList.put(list.get(i).toString());
 		}
-		
 		return newList;
 	}
 	
 	//Stage IV: The dating game
-	
+	public static String updateDate(String dateStamp, int interval) throws ParseException{
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		Date date = dateFormat.parse(dateStamp);
+		Calendar gc = new GregorianCalendar();
+		gc.setTime(date);
+		gc.add(Calendar.SECOND,interval);
+		date = gc.getTime();
+		return dateFormat.format(date).toString();	
+	}
 }
